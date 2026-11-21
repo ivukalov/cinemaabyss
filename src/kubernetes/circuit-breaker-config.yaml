@@ -1,0 +1,52 @@
+# Circuit breaker для монолита и сервиса фильмов.
+#
+# DestinationRule применяется к трафику, идущему ЧЕРЕЗ sidecar-прокси (Envoy)
+# на стороне вызывающего сервиса. Когда число одновременных запросов к
+# конкретному поду превышает лимиты connectionPool, Envoy отбрасывает
+# "лишние" запросы, не дожидаясь зависания: каждый отброшенный запрос
+# учитывается в метрике upstream_rq_pending_overflow.
+#
+# Проверка (после нагрузки Fortio):
+#   kubectl exec <pod> -c istio-proxy -- \
+#     pilot-agent request GET stats | grep upstream_rq_pending_overflow
+apiVersion: networking.istio.io/v1
+kind: DestinationRule
+metadata:
+  name: monolith-circuit-breaker
+  namespace: cinemaabyss
+spec:
+  host: monolith
+  trafficPolicy:
+    connectionPool:
+      tcp:
+        maxConnections: 1
+      http:
+        http1MaxPendingRequests: 1
+        http2MaxRequests: 1
+        maxRequestsPerConnection: 1
+    outlierDetection:
+      consecutive5xxErrors: 1
+      interval: 5s
+      baseEjectionTime: 30s
+      maxEjectionPercent: 100
+---
+apiVersion: networking.istio.io/v1
+kind: DestinationRule
+metadata:
+  name: movies-service-circuit-breaker
+  namespace: cinemaabyss
+spec:
+  host: movies-service
+  trafficPolicy:
+    connectionPool:
+      tcp:
+        maxConnections: 1
+      http:
+        http1MaxPendingRequests: 1
+        http2MaxRequests: 1
+        maxRequestsPerConnection: 1
+    outlierDetection:
+      consecutive5xxErrors: 1
+      interval: 5s
+      baseEjectionTime: 30s
+      maxEjectionPercent: 100

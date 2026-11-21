@@ -1,0 +1,53 @@
+# Fortio — генератор нагрузки для проверки circuit breaker.
+# Под запускается в namespace cinemaabyss, поэтому получает sidecar Envoy:
+# именно его статистика (upstream_rq_pending_overflow) показывает, что
+# circuit breaker сработал.
+apiVersion: v1
+kind: Service
+metadata:
+  name: fortio
+  namespace: cinemaabyss
+  labels:
+    app: fortio
+    service: fortio
+spec:
+  ports:
+  - port: 8080
+    name: http
+  selector:
+    app: fortio
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fortio-deploy
+  namespace: cinemaabyss
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fortio
+  template:
+    metadata:
+      annotations:
+        # Чтобы Envoy отдавал cluster.outbound-статистику через /stats.
+        proxy.istio.io/config: |-
+          proxyStatsMatcher:
+            inclusionPrefixes:
+            - "cluster.outbound"
+            - "cluster_manager"
+            - "listener_manager"
+            - "server"
+            - "cluster.xds-grpc"
+      labels:
+        app: fortio
+    spec:
+      containers:
+      - name: fortio
+        image: docker.io/fortio/fortio:1.25.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080
+          name: http-fortio
+        - containerPort: 8079
+          name: grpc-ping

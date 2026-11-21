@@ -4,8 +4,12 @@ global:
   domain: cinemaabyss.example.com
 
 # Image pull secrets
+# Вставьте сюда содержимое ~/.docker/config.json, прогнанное через base64:
+#   echo -n "ваш_логин:ваш_PAT" | base64        # значение поля "auth"
+#   cat ~/.docker/config.json | base64          # значение целиком в dockerconfigjson
+# Пустое значение допустимо, если пакеты ghcr.io сделаны публичными.
 imagePullSecrets:
-  dockerconfigjson: ewoJImF1dGhzIjogewoJCSJnaGNyLmlvIjogewoJCQkiYXV0aCI6
+  dockerconfigjson: ""
 # Database configuration
 database:
   host: postgres
@@ -33,7 +37,7 @@ database:
 monolith:
   enabled: true
   image:
-    repository: ghcr.io/db-exp/cinemaabysstest/monolith
+    repository: ghcr.io/ivukalov/cinemaabyss/monolith
     tag: latest
     pullPolicy: Always
   replicas: 1
@@ -53,7 +57,7 @@ monolith:
 proxyService:
   enabled: true
   image:
-    repository: ghcr.io/db-exp/cinemaabysstest/proxy-service
+    repository: ghcr.io/ivukalov/cinemaabyss/proxy-service
     tag: latest
     pullPolicy: Always
   replicas: 1
@@ -73,7 +77,7 @@ proxyService:
 moviesService:
   enabled: true
   image:
-    repository: ghcr.io/db-exp/cinemaabysstest/movies-service
+    repository: ghcr.io/ivukalov/cinemaabyss/movies-service
     tag: latest
     pullPolicy: Always
   replicas: 1
@@ -93,7 +97,7 @@ moviesService:
 eventsService:
   enabled: true
   image:
-    repository: ghcr.io/db-exp/cinemaabysstest/events-service
+    repository: ghcr.io/ivukalov/cinemaabyss/events-service
     tag: latest
     pullPolicy: Always
   replicas: 1

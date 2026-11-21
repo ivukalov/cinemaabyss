@@ -10,25 +10,25 @@ System_Boundary(cinemaabyss, "Кинобездна (Kubernetes)") {
 
   Container(gateway, "API Gateway / Proxy", "Go, net/http/httputil", "Единая точка входа: маршрутизация по префиксу, фиче-флаг миграции, rate limiting, проверка токена")
 
-  Container(identity, "Identity Service", "Go", "Регистрация, вход, профиль, роли · этап 2")
-  Container(movies, "Movies Service", "Go", "Метаданные фильмов, жанры, актёры, рейтинги · уже вынесен")
-  Container(subscriptions, "Subscriptions Service", "Go", "Тарифы, действующие подписки, промокоды и скидки · этап 3")
-  Container(payments, "Payments Service", "Go", "Платежи и возвраты, интеграция с эквайрингом · этап 3")
-  Container(favorites, "Favorites Service", "Go", "Избранное и список «посмотреть позже» · этап 4")
-  Container(recommendations, "Recommendations Service", "Go", "Адаптер и кэш подборок над внешней рекомендательной системой · этап 4")
-  Container(notifications, "Notifications Service", "Go", "Подписан на события, отправляет письма, SMS и push · этап 5")
+  Container(identity, "Identity Service", "Go", "Регистрация, вход, профиль, роли")
+  Container(movies, "Movies Service", "Go", "Метаданные фильмов, жанры, актёры, рейтинги")
+  Container(subscriptions, "Subscriptions Service", "Go", "Тарифы, действующие подписки, промокоды и скидки")
+  Container(payments, "Payments Service", "Go", "Платежи и возвраты, интеграция с эквайрингом")
+  Container(favorites, "Favorites Service", "Go", "Избранное и список 'посмотреть позже'")
+  Container(recommendations, "Recommendations Service", "Go", "Адаптер и кэш подборок над внешней рекомендательной системой")
+  Container(notifications, "Notifications Service", "Go", "Подписан на события, отправляет письма, SMS и push")
   Container(events, "Events Service (MVP)", "Go", "Продюсер и консьюмер Kafka: публикует доменные события и пишет полученные в лог")
 
-  Container(monolith, "Монолит (legacy)", "Go", "Остаток доменов на время миграции, выводится из эксплуатации после этапа 5")
+  Container(monolith, "Монолит (legacy)", "Go", "Остаток доменов на время миграции, выводится из эксплуатации")
 
-  ContainerQueue(kafka, "Kafka", "Apache Kafka 2.7", "Шина доменных событий: movie-, user-, payment-, subscription-events")
-  ContainerDb(db, "PostgreSQL", "PostgreSQL 14", "Отдельная БД (или схема) на каждый сервис")
+  ContainerQueue(kafka, "Kafka", "Kafka", "Шина доменных событий: movie-, user-, payment-, subscription-events")
+  ContainerDb(db, "PostgreSQL", "PostgreSQL", "Отдельная БД на каждый сервис")
   ContainerDb(redis, "Redis", "Redis", "Кэш каталога и подборок, rate limiting, состояние фиче-флагов")
 }
 
 System_Ext(clients, "Клиентские приложения", "Мобильное приложение, веб-SPA, приложение Smart TV")
 System_Ext(recsys, "Рекомендательная система", "Внешняя ML-платформа персональных подборок")
-System_Ext(acquirer, "Платёжные провайдеры", "Эквайринг, Apple Pay, Google Pay")
+System_Ext(acquirer, "Платёжные провайдеры", "Эквайринг")
 System_Ext(media, "CDN и объектное хранилище", "Постеры, трейлеры, видеопоток")
 System_Ext(messaging, "Провайдер уведомлений", "Email, SMS, push")
 

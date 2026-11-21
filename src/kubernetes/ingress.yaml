@@ -11,8 +11,17 @@ spec:
     - host: cinemaabyss.example.com
       http:
         paths:
-          #дополните конфигурацию для /
-          ...
+          # Всё остальное — через единую точку входа (API Gateway),
+          # она сама решает, в какой сервис отправить запрос.
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: proxy-service
+                port:
+                  number: 80
+          # События — напрямую в events-service, чтобы тесты могли проверить
+          # публикацию без участия шлюза.
           - path: /api/events
             pathType: Prefix
             backend:

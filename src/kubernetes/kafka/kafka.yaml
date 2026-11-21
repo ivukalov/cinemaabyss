@@ -153,9 +153,7 @@ spec:
           value: "movie-events:1:1,user-events:1:1,payment-events:1:1"
         - name: KAFKA_AUTO_CREATE_TOPICS_ENABLE
           value: "true"
-        # Брокер один, а по умолчанию Kafka требует фактор репликации 3 —
-        # служебный топик __consumer_offsets не создаётся, и consumer-группы
-        # навсегда получают "Group Coordinator Not Available".
+        # Один брокер: служебные топики иначе требуют репликации 3.
         - name: KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR
           value: "1"
         - name: KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR
@@ -166,17 +164,13 @@ spec:
           value: "1"
         - name: KAFKA_LOG_DIRS
           value: "/kafka/kafka-logs"
-        # Образ по умолчанию запускает JVM с -Xmx1G, что вместе с накладными
-        # расходами не влезает в лимит 1Gi и контейнер получает OOMKilled.
+        # По умолчанию -Xmx1G не влезает в лимит пода.
         - name: KAFKA_HEAP_OPTS
           value: "-Xmx512m -Xms256m"
         volumeMounts:
         - name: kafka-data
           mountPath: /kafka
-        # Первый старт брокера занимает несколько минут (а под эмуляцией amd64 —
-        # ещё дольше), поэтому liveness-проверка запускается только после того,
-        # как startupProbe увидел открытый порт: иначе kubelet перезапускает
-        # ещё не поднявшийся брокер и цикл не сходится.
+        # Старт брокера занимает минуты: liveness включается после startupProbe.
         startupProbe:
           tcpSocket:
             port: 9092

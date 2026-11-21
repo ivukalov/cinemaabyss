@@ -1,7 +1,8 @@
 # Архитектура микросервисов CinemaAbyss
 
-## Обзор.
- В проекте реализована следующая функциональность:
+## Обзор
+
+В проекте реализована следующая функциональность:
 
 - Извлечение микросервисов с использованием паттерна Strangler Fig
 - Развертывание в Kubernetes для оркестрации и масштабирования
@@ -58,7 +59,7 @@
 ### Helm Charts
 Charts Helm для упрощения развертывания и управления:
 
-Расположены в src/kubernetes/helm/cinemaabyss/.
+Расположены в src/kubernetes/helm/.
 
 ### Kafka
 Расположено в src/kubernetes/kafka/.
@@ -139,7 +140,7 @@ kubectl apply -f src/kubernetes/postgres.yaml
 ```bash
 kubectl apply -f src/kubernetes/monolith.yaml
 ```
-5.Разверните микросервисы:
+5. Разверните микросервисы:
 ```bash
 kubectl apply -f src/kubernetes/movies-service.yaml
 kubectl apply -f src/kubernetes/events-service.yaml
@@ -162,9 +163,7 @@ kubectl apply -f src/kubernetes/proxy-service.yaml
 3. Выполните ручное или автоматическое развертывание (Helm) в локальной среде
 
 ## Тестирование API с Postman
-Проект включает комплексный набор тестов Postman, которые можно запускать из командной строки с помощью Newman. 
-
-Тесты проверяют базовую функциональность всех сервисов в архитектуре.
+Набор тестов Postman запускается из командной строки через Newman.
 
 Покрытие тестами
 -  сервис: Пользователи, Фильмы, Платежи, Подписки

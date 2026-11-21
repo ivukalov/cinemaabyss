@@ -1,14 +1,7 @@
 # Circuit breaker для монолита и сервиса фильмов.
-#
-# DestinationRule применяется к трафику, идущему ЧЕРЕЗ sidecar-прокси (Envoy)
-# на стороне вызывающего сервиса. Когда число одновременных запросов к
-# конкретному поду превышает лимиты connectionPool, Envoy отбрасывает
-# "лишние" запросы, не дожидаясь зависания: каждый отброшенный запрос
-# учитывается в метрике upstream_rq_pending_overflow.
-#
-# Проверка (после нагрузки Fortio):
-#   kubectl exec <pod> -c istio-proxy -- \
-#     pilot-agent request GET stats | grep upstream_rq_pending_overflow
+# connectionPool ограничивает одновременные запросы к поду, outlierDetection
+# выводит под из балансировки после ошибок. Отброшенные запросы видны в метрике
+# upstream_rq_pending_overflow (см. docs/circuit-breaker.md).
 apiVersion: networking.istio.io/v1
 kind: DestinationRule
 metadata:

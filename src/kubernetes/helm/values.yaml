@@ -3,11 +3,6 @@ global:
   namespace: cinemaabyss
   domain: cinemaabyss.example.com
 
-# Image pull secrets
-# Вставьте сюда содержимое ~/.docker/config.json, прогнанное через base64:
-#   echo -n "ваш_логин:ваш_PAT" | base64        # значение поля "auth"
-#   cat ~/.docker/config.json | base64          # значение целиком в dockerconfigjson
-# Пустое значение допустимо, если пакеты ghcr.io сделаны публичными.
 imagePullSecrets:
   dockerconfigjson: ""
 # Database configuration

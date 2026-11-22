@@ -48,8 +48,6 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     healthcheck:
-      # Порт открывается раньше, чем брокер готов принимать записи (выборы
-      # лидеров партиций), поэтому проверяем не сокет, а ответ Kafka API.
       test: ["CMD-SHELL", "/opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server localhost:9092 > /dev/null 2>&1"]
       interval: 30s
       timeout: 45s

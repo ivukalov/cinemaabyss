@@ -1,7 +1,3 @@
-# Fortio — генератор нагрузки для проверки circuit breaker.
-# Под запускается в namespace cinemaabyss, поэтому получает sidecar Envoy:
-# именно его статистика (upstream_rq_pending_overflow) показывает, что
-# circuit breaker сработал.
 apiVersion: v1
 kind: Service
 metadata:
@@ -30,7 +26,6 @@ spec:
   template:
     metadata:
       annotations:
-        # Чтобы Envoy отдавал cluster.outbound-статистику через /stats.
         proxy.istio.io/config: |-
           proxyStatsMatcher:
             inclusionPrefixes:

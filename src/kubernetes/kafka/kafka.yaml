@@ -69,7 +69,7 @@ spec:
           value: "2000"
         volumeMounts:
         - name: zookeeper-data
-          mountPath: /var/lib/zookeeper/data
+          mountPath: /opt/zookeeper-3.4.13/data
         readinessProbe:
           tcpSocket:
             port: 2181
@@ -155,6 +155,9 @@ spec:
           value: "true"
         # Один брокер: служебные топики иначе требуют репликации 3.
         - name: KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR
+          value: "1"
+        # 50 партиций по умолчанию слишком тяжелы для одного брокера.
+        - name: KAFKA_OFFSETS_TOPIC_NUM_PARTITIONS
           value: "1"
         - name: KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR
           value: "1"

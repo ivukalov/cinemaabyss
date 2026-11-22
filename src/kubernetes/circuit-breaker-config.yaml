@@ -1,7 +1,6 @@
 # Circuit breaker для монолита и сервиса фильмов.
 # connectionPool ограничивает одновременные запросы к поду, outlierDetection
-# выводит под из балансировки после ошибок. Отброшенные запросы видны в метрике
-# upstream_rq_pending_overflow (см. docs/circuit-breaker.md).
+# выводит под из балансировки после ошибок.
 apiVersion: networking.istio.io/v1
 kind: DestinationRule
 metadata:

@@ -1,0 +1,72 @@
+@startuml C4_Container_ToBe
+!include <C4/C4_Container>
+
+title Кинобездна — контейнерная диаграмма целевого состояния (To-Be)
+
+Person(viewer, "Зритель", "Смотрит кино через мобильное приложение, сайт и Smart TV")
+Person(editor, "Контент-менеджер", "Ведёт каталог, промо-акции и тарифы")
+
+System_Boundary(cinemaabyss, "Кинобездна (Kubernetes)") {
+
+  Container(gateway, "API Gateway / Proxy", "Go, net/http/httputil", "Единая точка входа: маршрутизация по префиксу, фиче-флаг миграции, rate limiting, проверка токена")
+
+  Container(identity, "Identity Service", "Go", "Регистрация, вход, профиль, роли")
+  Container(movies, "Movies Service", "Go", "Метаданные фильмов, жанры, актёры, рейтинги")
+  Container(subscriptions, "Subscriptions Service", "Go", "Тарифы, действующие подписки, промокоды и скидки")
+  Container(payments, "Payments Service", "Go", "Платежи и возвраты, интеграция с эквайрингом")
+  Container(favorites, "Favorites Service", "Go", "Избранное и список 'посмотреть позже'")
+  Container(recommendations, "Recommendations Service", "Go", "Адаптер и кэш подборок над внешней рекомендательной системой")
+  Container(notifications, "Notifications Service", "Go", "Подписан на события, отправляет письма, SMS и push")
+  Container(events, "Events Service (MVP)", "Go", "Продюсер и консьюмер Kafka: публикует доменные события и пишет полученные в лог")
+
+  Container(monolith, "Монолит (legacy)", "Go", "Остаток доменов на время миграции, выводится из эксплуатации")
+
+  ContainerQueue(kafka, "Kafka", "Kafka", "Шина доменных событий: movie-, user-, payment-, subscription-events")
+  ContainerDb(db, "PostgreSQL", "PostgreSQL", "Отдельная БД на каждый сервис")
+  ContainerDb(redis, "Redis", "Redis", "Кэш каталога и подборок, rate limiting, состояние фиче-флагов")
+}
+
+System_Ext(clients, "Клиентские приложения", "Мобильное приложение, веб-SPA, приложение Smart TV")
+System_Ext(recsys, "Рекомендательная система", "Внешняя ML-платформа персональных подборок")
+System_Ext(acquirer, "Платёжные провайдеры", "Эквайринг")
+System_Ext(media, "CDN и объектное хранилище", "Постеры, трейлеры, видеопоток")
+System_Ext(messaging, "Провайдер уведомлений", "Email, SMS, push")
+
+Rel(viewer, clients, "Пользуется")
+Rel(editor, clients, "Пользуется")
+Rel(clients, gateway, "HTTPS / REST", "JSON")
+Rel(clients, media, "Скачивает постеры и видео", "HTTPS")
+
+Rel(gateway, identity, "REST")
+Rel(gateway, movies, "REST")
+Rel(gateway, subscriptions, "REST")
+Rel(gateway, payments, "REST")
+Rel(gateway, favorites, "REST")
+Rel(gateway, recommendations, "REST")
+Rel(gateway, monolith, "Оставшиеся маршруты", "REST")
+Rel(gateway, redis, "rate limit")
+
+Rel(identity, db, "SQL")
+Rel(movies, db, "SQL")
+Rel(subscriptions, db, "SQL")
+Rel(payments, db, "SQL")
+Rel(favorites, db, "SQL")
+
+Rel(movies, redis, "кэш")
+Rel(recommendations, redis, "кэш")
+
+Rel(identity, kafka, "user-events", "async")
+Rel(movies, kafka, "movie-events", "async")
+Rel(payments, kafka, "payment-events", "async")
+Rel(subscriptions, kafka, "subscription-events", "async")
+
+Rel(events, kafka, "публикует", "async, MVP")
+Rel(kafka, events, "читает, лог", "async, MVP")
+Rel(kafka, notifications, "события", "async")
+
+Rel(payments, acquirer, "Списывает и возвращает", "HTTPS")
+Rel(recommendations, recsys, "Запрашивает подборки", "HTTPS/REST")
+Rel(notifications, messaging, "Отправляет сообщения", "HTTPS")
+
+LAYOUT_LEFT_RIGHT()
+@enduml
